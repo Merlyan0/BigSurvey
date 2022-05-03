@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block head %}<link rel="stylesheet" href="/static/css/survey.css">
+{% endblock %}
+
+{% block content %}
+{% if error == 'Данного опроса не существует или он является приватным.' %}
+    <div class="container2">
+        <div class="alert alert-danger" role="alert">
+            <h3>Ошибка! Данного опроса не существует или он является приватным.</h3>
+        </div>
+    </div>
+{% else %}
+    <div class="container2">
+        <div class="alert alert-secondary" role="alert">
+            <h5 class="header">Опрос: </h5><strong>{{ survey.title }}</strong>
+            <p>{{ survey.description }}</p>
+            <p>Все поля обязательны к заполнению.</p>
+            <p>Если вы создатель этого теста, кликните <a href="{{ request.path.split('/')[-1]}}/edit">сюда</a>.</p>
+        </div>
+
+        <form class="form" method="post">
+            {% if survey.ask_name %}
+                <label for="name">Введите имя и фамилию</label> <br>
+                <input id="name" name="name" type="text" required class="input2"/>
+            {% endif %}
+
+            {% for i in questions %}
+                {% set ind = loop.index %}
+
+                <h3>{{ i.title }}</h3>
+                {% for j in i.var.split(' / ') %}
+                    <div class="inputGroup">
+                        <input id="option{{ ind }}{{ loop.index }}" name="radio{{ ind }}" type="radio" value="{{ j }}" required/>
+                        <label for="option{{ ind }}{{ loop.index }}">{{ j }}</label>
+                   </div>
+                {% endfor %}
+
+            {% endfor %}
+
+            <button type="submit" class="btn btn-outline-secondary mb-3" name="send" value="Отправить">Отправить</button>
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

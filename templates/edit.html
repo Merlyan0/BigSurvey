@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container2">
+    <!-- Сообщения -->
+    {% if message %}
+        <div class="alert alert-success" role="alert">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <!-- Меню с вкладками -->
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <button class="nav-link active" id="nav-main-tab" data-bs-toggle="tab" data-bs-target="#nav-main" type="button" role="tab" aria-controls="nav-main" aria-selected="true">Общее</button>
+            <button class="nav-link" id="nav-add-tab" data-bs-toggle="tab" data-bs-target="#nav-add" type="button" role="tab" aria-controls="nav-add" aria-selected="false">Добавить вопрос</button>
+            <button class="nav-link" id="nav-questions-tab" data-bs-toggle="tab" data-bs-target="#nav-questions" type="button" role="tab" aria-controls="nav-questions" aria-selected="false">Все вопросы</button>
+            <button class="nav-link" id="nav-attempts-tab" data-bs-toggle="tab" data-bs-target="#nav-attempts" type="button" role="tab" aria-controls="nav-attempts" aria-selected="false">Попытки</button>
+        </div>
+    </nav>
+
+    <!-- Меню с вкладками: продолжение -->
+    <div class="tab-content" id="nav-tabContent">
+
+        <!-- Блок "Общее" -->
+        <div class="tab-pane fade show active" id="nav-main" role="tabpanel" aria-labelledby="nav-main-tab">
+            <div class="container2">
+                <h3>Общее</h3>
+                <form action="" method="post">
+
+                    <!-- Чекбокс: спрашивать имя пользователя -->
+                    <div class="form-check form-switch">
+                        {% if survey.ask_name %}
+                            {% set ask_name = 'checked' %}
+                        {% else %}
+                            {% set ask_name = '' %}
+                        {% endif %}
+
+                        <input class="form-check-input" type="checkbox" role="switch" id="ask_name" name="ask_name" {{ ask_name }}>
+                        <label class="form-check-label" for="ask_name">Запрашивать имя и фамилию пользователя</label>
+                    </div>
+
+                    <!-- Чекбокс: приватный опрос -->
+                    <div class="form-check form-switch">
+                        {% if survey.private %}
+                            {% set private = 'checked' %}
+                        {% else %}
+                            {% set private = '' %}
+                        {% endif %}
+
+                        <input class="form-check-input" type="checkbox" role="switch" id="private" name="private" {{ private }}>
+                        <label class="form-check-label" for="private">Приватный опрос</label>
+                    </div>
+
+                    <!-- Приватная ссылка на опрос, если включена соответствующая функция -->
+                    {% if private %}
+                        <p>Приватная ссылка на ваш опрос: <a href="/survey/{{ survey.private_url }}">{{ request.url_root }}survey/{{ survey.private_url }}</a></p>
+                    {% else %}
+                        <p>Ссылка на ваш опрос: <a href="/survey/{{ survey.id }}">{{ request.url_root }}survey/{{ survey.id }}</a></p>
+                    {% endif %}
+
+                    <button type="submit" name="save_settings" value="Сохранить настройки" class="btn btn-outline-primary mb-3">Сохранить найстроки</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Блок "Добавить вопрос" -->
+        <div class="tab-pane fade" id="nav-add" role="tabpanel" aria-labelledby="nav-add-tab">
+            <div class="container2">
+                <h3>Добавить вопрос</h3>
+                <form action="" method="post">
+
+                    <!-- Сам вопрос -->
+                    <div class="mb-3">
+                        <label for="title">Вопрос</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+
+                    <!-- Варианты ответа -->
+                    <div class="mb-3">
+                        <label for="var" class="form-label">Варианты ответа (каждый - на новой строке).</label>
+                        <p>В конце правильного ответа (если вопрос подразумевает его наличие; если нет - ничего делать не надо) поставьте звездочку: *. (Например, ель*)</p>
+                        <textarea class="form-control" id="var" name="var" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-outline-primary mb-3" name="save" value="Сохранить">Сохранить</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Блок всех добавленных вопросов -->
+        <div class="tab-pane fade" id="nav-questions" role="tabpanel" aria-labelledby="nav-questions-tab">
+            <div class="container2">
+
+                <!-- Форма удаления какого-либа вопроса -->
+                <form action="" method="post">
+                    <label for="title" class="form-label">Если необходимо удалить вопрос, то введите его номер ниже и нажмите "Удалить":</label>
+                    <input type="number" class="form-control" id="del_id" name="del_id" required>
+                    <button type="submit" class="btn mb-3 button2 btn-outline-danger" name="del" value="Удалить">Удалить</button>
+                </form>
+
+                <h3>Добавленные вопросы</h3>
+                <p>Зеленым цветом отмечены правильные ответы, если таковые есть.</p>
+
+                <!-- Вывод всех добавленных вопросов -->
+                <ol class="list-group list-group-numbered">
+                    {% for i in questions %}
+
+                        <!-- Вопрос -->
+                        <li class="list-group-item li2">{{ i.title }}</li>
+
+                        <ul class="list-group list-group-horizontal">
+                            <!-- Варианты ответа -->
+                            {% for j in i.var.split(' / ') %}
+                                {% if j == i.right %}
+                                    <li class="list-group-item list-group-item-success">{{ j }}</li>
+                                {% else %}
+                                    <li class="list-group-item">{{ j }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+
+        <!-- Блок "Попытки" -->
+        <div class="tab-pane fade" id="nav-attempts" role="tabpanel" aria-labelledby="nav-attempts-tab">
+            <div class="container2">
+                <h3>Попытки</h3>
+                <p>Попытка — это воспроизведение ответов на вопросы какого-либо определенного пользователя.
+                То есть с её помощью вы сможете посмотреть, какие конкретно ответы дал тот или иной пользователь.</p>
+
+                <!-- Форма воспроизведения попытки -->
+                <form action="" method="post">
+                    <label for="title" class="form-label">Для воспроизведение определенной попытки введите её номер ниже и нажмите "Воспроизвести":</label>
+                    <input type="number" class="form-control" id="attempt_id" name="attempt_id" required>
+                    <button type="submit" class="btn mb-3 button2 btn btn-outline-primary" name="play" value="Воспроизвести">Воспроизвести</button>
+                </form>
+
+                <!-- Вывод всех попыток -->
+                <ul class="list-group list-group-numbered">
+                    {% for i in attempts %}
+                        {% if not i.name %}
+                            <li class="list-group-item">Неизвестный пользователь: {{ i.created_date.strftime('%d.%m.%Y в %T') }}</li>
+                        {% else %}
+                            <li class="list-group-item">{{ i.name }}: {{ i.created_date.strftime('%d.%m.%Y в %T') }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <hr>
+
+                <!-- Воспроизведенная попытка -->
+                {% if user_attempt %}
+                    {% if not user_attempt.name %}
+                        <h5>Попытка пользователя *неизвестно* {{ user_attempt.created_date.strftime('%d.%m.%Y в %T') }}</h5>
+                    {% else %}
+                        <h5>Попытка пользователя {{ user_attempt.name }} {{ user_attempt.created_date.strftime('%d.%m.%Y в %T') }}</h5>
+                    {% endif %}
+
+                    <p>Зелёный - правильный ответ на вопрос, если таковой есть. <br>
+                        Красный - неправильный ответ, если вы ответили неверно. <br>
+                        Желтым - ваш ответ на вопрос, не предусматривающий правильного ответа.</p>
+
+                    <!-- Вывод вопросов с ответами пользователя -->
+                    <ol class="list-group list-group-numbered">
+
+                        {% for i in questions %}
+                            <!-- Сам вопрос -->
+                            <li class="list-group-item li2">{{ i.title }}</li>
+                            <ul class="list-group list-group-horizontal">
+
+                                <!-- Ответ пользователя -->
+                                {% set answered = user_attempt.answers.split(' / ')[loop.index0] %}
+
+                                {% for j in i.var.split(' / ') %}
+
+                                    {% if i.right == 'None' %}
+                                        <!-- Ответ на вопрос, не предусматривающий правильного ответа -->
+                                        {% if j == answered and j != i.right %}
+                                            <li class="list-group-item list-group-item-warning">{{ j }}</li>
+                                        {% else %}
+                                            <li class="list-group-item">{{ j }}</li>
+                                        {% endif %}
+
+                                    {% else%}
+                                        <!-- Ответ на вопрос, предусматривающий правильный ответ -->
+                                        {% if j == answered and j != i.right %}
+                                            <li class="list-group-item list-group-item-danger">{{ j }}</li>
+                                        {% elif j == i.right %}
+                                            <li class="list-group-item list-group-item-success">{{ j }}</li>
+                                        {% else %}
+                                            <li class="list-group-item">{{ j }}</li>
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </ul>
+                        {% endfor %}
+                    </ol>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

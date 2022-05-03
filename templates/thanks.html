@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container2">
+    <div class="alert alert-info" role="alert">
+        Спасибо за участие в опросе!
+    </div>
+
+    <h3>Ваши ответы</h3>
+    <p>Зелёный - правильный ответ на вопрос, если таковой есть. <br>
+       Красный - неправильный ответ, если вы ответили неверно. <br>
+       Желтым - ваш ответ на вопрос, не предусматривающий правильного ответа.</p>
+
+    <ol class="list-group list-group-numbered">
+        {% for i in questions %}
+            <li class="list-group-item li2">{{ i.title }}</li>
+                <ul class="list-group list-group-horizontal">
+                    {% set answered = user_attempt.answers.split(' / ')[loop.index0] %}
+
+                    {% for j in i.var.split(' / ') %}
+
+                        {% if i.right == 'None' %}
+
+                            {% if j == answered and j != i.right %}
+                                <li class="list-group-item list-group-item-warning">{{ j }}</li>
+                            {% else %}
+                                <li class="list-group-item">{{ j }}</li>
+                            {% endif %}
+
+                        {% else%}
+
+                            {% if j == answered and j != i.right %}
+                                <li class="list-group-item list-group-item-danger">{{ j }}</li>
+                            {% elif j == i.right %}
+                                <li class="list-group-item list-group-item-success">{{ j }}</li>
+                            % else %}
+                                <li class="list-group-item">{{ j }}</li>
+                            {% endif %}
+
+                        {% endif %}
+
+                    {% endfor %}
+                </ul>
+        {% endfor %}
+    </ol>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container2">
+  {% if not surveys %}
+    <h3>Опросов в базе данных не обнаружено.</h3>
+  {% endif %}
+
+  {% for i in surveys %}
+    <div class="card">
+      <h5 class="card-header">Опрос №{{ i.id }}</h5>
+      <div class="card-body">
+        <h5 class="card-title">{{ i.title }}</h5>
+        <p class="card-text">{{ i.description }}</p>
+        <a href="/survey/{{ i.id }}" class="btn btn-primary">Перейти</a>
+      </div>
+    </div>
+  <br>
+  {% endfor %}
+</div>
+{% endblock %}
