@@ -218,7 +218,8 @@ def edit_survey(survey_id) -> Union[str, Response]:
             db_sess = db_session.create_session()
             attempt_id_old = int(request.form.get('attempt_id'))
 
-            if attempt_id_old - 1 > len(db_sess.query(Attempt).filter_by(survey=survey_id).all()):
+            if attempt_id_old - 1 >= len(db_sess.query(Attempt).filter_by(survey=survey_id).all()) \
+                    or attempt_id_old - 1 < 0:
                 return render_template('edit.html',
                                        survey=survey,
                                        questions=db_sess.query(Question).filter_by(survey=survey_id).all(),
