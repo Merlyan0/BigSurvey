@@ -177,7 +177,7 @@
 
                                 {% for j in i.var.split(' / ') %}
 
-                                    {% if i.right == 'None' %}
+                                    {% if i.right == 'None' or not i.right %}
                                         <!-- Ответ на вопрос, не предусматривающий правильного ответа -->
                                         {% if j == answered and j != i.right %}
                                             <li class="list-group-item list-group-item-warning">{{ j }}</li>
