@@ -27,13 +27,13 @@
                                 <li class="list-group-item">{{ j }}</li>
                             {% endif %}
 
-                        {% else%}
+                        {% else %}
 
                             {% if j == answered and j != i.right %}
                                 <li class="list-group-item list-group-item-danger">{{ j }}</li>
                             {% elif j == i.right %}
                                 <li class="list-group-item list-group-item-success">{{ j }}</li>
-                            % else %}
+                            {% else %}
                                 <li class="list-group-item">{{ j }}</li>
                             {% endif %}
 
